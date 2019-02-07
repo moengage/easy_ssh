@@ -1,0 +1,10 @@
+---
+- hosts: all
+  user: ubuntu
+  become: yes
+  gather_facts: true
+  vars_files:
+    - base_vars.yml
+
+  roles:
+    - { role: configure-bastion, tags: ['bastion'] }

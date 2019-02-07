@@ -1,0 +1,32 @@
+- name: Configure server to trust certificate authority public key.
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    line: "{{ item }}"
+  with_items:
+    - 'TrustedUserCAKeys /etc/ssh/cert-authority.pub'
+    - 'AuthorizedPrincipalsFile /etc/ssh/auth_principals/%u'
+  notify: reload ssh
+
+- name: Copy CA's public key from template
+  lineinfile:
+    path: /etc/ssh/cert-authority.pub
+    line: "{{ public_ca_key }}"
+
+- name: Create the authorize principal directory.
+  file:
+    path: /etc/ssh/auth_principals
+    owner: root
+    mode: 0755
+    state: directory
+
+- name: Copy CA's public key from template
+  template:
+    src: "{{ group_name | default('default') }}.j2"
+    dest: /etc/ssh/ubuntu #TODO change ubuntu
+    owner: root
+    mode: 0400
+  notify: reload ssh
+
+- name: Set principal file permission to read-only.
+  shell: chattr +i /etc/ssh/auth_principals/ubuntu #TODO change ubuntu
+

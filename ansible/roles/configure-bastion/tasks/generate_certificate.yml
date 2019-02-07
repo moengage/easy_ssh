@@ -1,0 +1,23 @@
+- name: Create a directory to store a user data
+  file:
+    path: '/home/ubuntu/users_keys/{{username}}/'
+    state: directory
+
+- name: Get a random number for user_id
+  shell: python -c "import hashlib; print abs(hash('{{username}}')) % (10 ** 8)"
+  register: user_id
+
+- debug: msg="{{user_id.stdout}}"
+
+- name: Copy user pub key
+  lineinfile:
+    path: '/home/ubuntu/users_keys/{{username}}/{{username}}_id_rsa_{{user_id.stdout}}.pub'
+    line: "{{ user_public_key }}"
+    create: yes
+    state: present
+
+- name: Generate certificate from CA
+  shell: "ssh-keygen -s /home/ubuntu/moe-ca/ca -I {{username}} -n devops -z {{user_id.stdout}} -P {{key_password}} /home/ubuntu/users_keys/{{username}}/{{username}}_id_rsa_{{user_id.stdout}}.pub"
+
+- shell: cat "/home/ubuntu/users_keys/{{username}}/{{username}}_id_rsa_{{user_id.stdout}}-cert.pub"
+  register: user_pub_cert

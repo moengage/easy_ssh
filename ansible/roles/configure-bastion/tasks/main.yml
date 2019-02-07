@@ -1,0 +1,16 @@
+- include: create_user.yml
+  when: "'bastion' in group_names"
+
+- name: Get public key created on bastion
+  set_fact:
+    user_public_key: "{{ hostvars[groups['bastion'][0]]['user_ssh_key']['stdout'] }}"
+ 
+- include: generate_certificate.yml
+  when: "'ca' in group_names"
+
+- name: Get public key created on bastion
+  set_fact:
+    user_cert: "{{ hostvars[groups['ca'][0]]['user_pub_cert']['stdout'] }}"
+
+- include: setup_client.yml
+  when: "'bastion' in group_names"

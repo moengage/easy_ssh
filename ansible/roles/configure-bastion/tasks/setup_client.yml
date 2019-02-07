@@ -1,0 +1,11 @@
+- name: Paste certificate to SSH directory.
+  lineinfile:
+    path: '/home/{{ username }}/.ssh/id_rsa-cert.pub'
+    line: "{{ user_cert }}"
+    create: yes
+    state: present
+
+- name: Configure server to trust certificate authority public key.
+  lineinfile:
+    path: /home/{{ username }}/.ssh/known_hosts
+    line: "@cert-authority * {{ public_ca_key }}"

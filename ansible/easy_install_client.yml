@@ -4,7 +4,8 @@
   become: yes
   gather_facts: true
   vars_files:
-    - base_vars.yml
+    - vars/base_vars.yml
+    - vars/server_vars.yml
 
   roles:
     - { role: configure-bastion, tags: ['bastion'] }

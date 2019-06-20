@@ -1,10 +1,13 @@
 ---
 - hosts: server
-  user: ubuntu
+  user: {{ user }}
   become: yes
   gather_facts: true
+  pre_tasks:
+    - name: install python 2
+      raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal)
   vars_files:
-    - base_vars.yml
+    - vars/base_vars.yml
 
   roles:
     - { role: configure-server, tags: ['server'] }
